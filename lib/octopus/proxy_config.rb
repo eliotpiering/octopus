@@ -205,7 +205,8 @@ module Octopus
         @fully_replicated = true
       end
 
-      @slaves_list = shards.keys.map(&:to_s).sort
+      replicas = config[Rails.env].select {|k, v| !v[:remove_from_replica_pool] }.keys
+      @slaves_list = shards.keys.map(&:to_s).select { |s| replicas.include?(s) }.sort
       @slaves_list.delete('master')
       @slaves_load_balancer = Octopus.load_balancer.new(@slaves_list)
     end
